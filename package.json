@@ -1,0 +1,41 @@
+{
+  "name": "vite-vue3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode dev",
+    "sit": "vite --mode sit",
+    "uat": "vite --mode uat",
+    "prod": "vite --mode prod",
+    "lint": "eslint src --ext .vue,.js,.jsx",
+    "build": "vite build --mode dev",
+    "build:dev": "vite build --mode dev",
+    "build:sit": "vite build --mode sit",
+    "build:uat": "vite build --mode uat",
+    "build:prod": "vite build --mode prod",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "ant-design-vue": "^3.2.20",
+    "element-plus": "^2.3.7",
+    "mathjs": "^11.9.1",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "vxe-table": "^4.4.2",
+    "xe-utils": "^3.5.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.10",
+    "@babel/eslint-parser": "^7.22.10",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "sass": "^1.62.1",
+    "vite": "^4.3.2",
+    "vue-eslint-parser": "^9.3.1"
+  }
+}
