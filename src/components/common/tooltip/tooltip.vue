@@ -14,7 +14,7 @@ const props = defineProps({
 const emit = defineEmits(['enterTooltip', 'leaveTooltip'])
 
 const tooltipRef = ref(null)
-const tooltipInfo = reactive({
+const tooltipConfig = reactive({
   content: null,
   maxWidth: 0,
   maxHeight: 0,
@@ -58,18 +58,18 @@ function updatePosition() {
     updateArrowStyle(arrowLeft, 'bottom')
   }
 
-  tooltipInfo.left = tooltipLeft + htmlScrollLeft
-  tooltipInfo.top = tooltipTop + htmlScrollTop
+  tooltipConfig.left = tooltipLeft + htmlScrollLeft
+  tooltipConfig.top = tooltipTop + htmlScrollTop
 
   nextTick(() => {
-    tooltipInfo.opacity = 1
+    tooltipConfig.opacity = 1
   })
 }
 
 // 更新箭头的样式
 function updateArrowStyle(left, direction = 'top') {
   if (direction === 'bottom') {
-    tooltipInfo.arrowStyle = {
+    tooltipConfig.arrowStyle = {
       left: left + 'px',
       top: '-5px',
       'border-right-color': 'transparent',
@@ -77,7 +77,7 @@ function updateArrowStyle(left, direction = 'top') {
       'border-top-left-radius': '2px',
     }
   } else {
-    tooltipInfo.arrowStyle = {
+    tooltipConfig.arrowStyle = {
       left: left + 'px',
       bottom: '-5px',
       'border-top-color': 'transparent',
@@ -105,13 +105,13 @@ function updateTooltipInfo(el) {
   const bottomDistance = htmlHeight - bound.top - el.clientHeight
   const maxHeight = Math.max(bound.top, bottomDistance) - 40
 
-  tooltipInfo.content = el.innerText
-  tooltipInfo.maxWidth = maxWidth < 500 ? maxWidth : 500
-  tooltipInfo.maxHeight = maxHeight < 500 ? maxHeight : 500
+  tooltipConfig.content = el.innerText
+  tooltipConfig.maxWidth = maxWidth < 500 ? maxWidth : 500
+  tooltipConfig.maxHeight = maxHeight < 500 ? maxHeight : 500
 }
 
 function updateOpacity(val) {
-  tooltipInfo.opacity = val
+  tooltipConfig.opacity = val
 }
 
 // 鼠标是移入到 tooltip 中
@@ -126,7 +126,7 @@ onMounted(() => {
   updatePosition()
 
   nextTick(() => {
-    tooltipInfo.opacity = 1
+    tooltipConfig.opacity = 1
   })
 })
 
@@ -142,9 +142,9 @@ defineExpose({
     ref="tooltipRef"
     class="tooltip"
     :style="{
-      left: tooltipInfo.left + 'px',
-      top: tooltipInfo.top + 'px',
-      opacity: tooltipInfo.opacity,
+      left: tooltipConfig.left + 'px',
+      top: tooltipConfig.top + 'px',
+      opacity: tooltipConfig.opacity,
     }"
     @mouseenter="enterTooltip"
     @mouseleave="leaveTooltip"
@@ -152,14 +152,14 @@ defineExpose({
     <div
       class="tooltip-content"
       :style="{
-        'max-width': tooltipInfo.maxWidth + 'px',
-        'max-height': tooltipInfo.maxHeight + 'px',
+        'max-width': tooltipConfig.maxWidth + 'px',
+        'max-height': tooltipConfig.maxHeight + 'px',
       }"
     >
-      {{ tooltipInfo.content }}
+      {{ tooltipConfig.content }}
     </div>
 
-    <div class="tooltip-arrow" :style="tooltipInfo.arrowStyle"></div>
+    <div class="tooltip-arrow" :style="tooltipConfig.arrowStyle"></div>
   </div>
 </template>
 

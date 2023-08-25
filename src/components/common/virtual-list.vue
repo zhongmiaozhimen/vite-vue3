@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, reactive, watch, nextTick } from 'vue'
 
 const props = defineProps({
   data: {
@@ -14,11 +14,7 @@ const props = defineProps({
     type: Number,
     default: undefined,
   },
-  // 列表中每一个元素的高度
-  itemHeight: {
-    type: Number,
-    default: undefined,
-  },
+  // 最小行高
   minItemHeight: {
     type: Number,
     default: 20,
@@ -33,6 +29,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showOverflowTooltip: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 let list = listInit()
@@ -40,7 +40,7 @@ let total = list.length
 
 const viewportMaxHeight = ref(props.height ? null : props.maxHeight)
 
-let itemHeight = props.itemHeight
+let itemHeight = 0
 let viewportNumber = 0 // 视口区域中加载的列表数量
 let viewporOutsideNumber = 0 // 视口区域之外需要额外加载的列表数量
 
@@ -58,6 +58,16 @@ const listRef = ref(null)
 
 let listHeights = [] // 记录列表中每个元素的高度
 let ticking = false
+
+const tooltipConfig = reactive({
+  content: null,
+  maxWidth: 0,
+  maxHeight: 0,
+  left: 0,
+  top: 0,
+  opacity: 0,
+  arrowStyle: null,
+})
 
 init()
 
@@ -127,7 +137,8 @@ function init() {
     return
   }
 
-  if (props.fixed && !props.itemHeight) {
+  if (props.fixed) {
+    // 先加载一个元素
     loadList.value = list.slice(0, 1)
 
     nextTick(() => {
@@ -329,6 +340,14 @@ function listScroll(el) {
 
   updateLoadList(el.target.scrollTop)
 }
+
+// 鼠标是移入到 tooltip 中
+function enterTooltip() {
+  //
+}
+function leaveTooltip() {
+  //
+}
 </script>
 
 <template>
@@ -347,13 +366,14 @@ function listScroll(el) {
         'padding-top': paddingTop + 'px',
         'padding-bottom': paddingBottom + 'px',
       }"
+      @mouseenter="enterTooltip"
+      @mouseleave="leaveTooltip"
     >
       <li
         v-for="item in loadList"
         :key="item.id"
         class="list-item"
         :style="{
-          height: fixed && props.itemHeight ? props.itemHeight + 'px' : '',
           'word-break': fixed ? 'normal' : 'break-all',
           overflow: fixed ? 'hidden' : 'visible',
         }"
@@ -361,11 +381,63 @@ function listScroll(el) {
         <slot :item="item.data"></slot>
       </li>
     </ul>
+
+    <div
+      v-if="showOverflowTooltip"
+      class="tooltip"
+      :style="{
+        left: tooltipConfig.left + 'px',
+        top: tooltipConfig.top + 'px',
+        opacity: tooltipConfig.opacity,
+      }"
+    >
+      <div
+        class="tooltip-content"
+        :style="{
+          'max-width': tooltipConfig.maxWidth + 'px',
+          'max-height': tooltipConfig.maxHeight + 'px',
+        }"
+      >
+        {{ tooltipConfig.content }}
+      </div>
+
+      <div class="tooltip-arrow" :style="tooltipConfig.arrowStyle"></div>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .list-wrap {
   overflow-y: auto;
+  position: relative;
+
+  .tooltip {
+    position: absolute;
+    z-index: 9999;
+    border: 1px solid #666;
+    border-radius: 4px;
+    min-width: 30px;
+    background-color: #fff;
+    transition: opacity 0.2s linear;
+
+    .tooltip-content {
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 0 10px;
+      margin: 5px 0;
+      word-break: break-all;
+      overflow: auto;
+    }
+
+    .tooltip-arrow {
+      width: 10px;
+      height: 10px;
+      box-sizing: border-box;
+      border: 1px solid #666;
+      background-color: #fff;
+      transform: rotate(45deg);
+      position: absolute;
+    }
+  }
 }
 </style>

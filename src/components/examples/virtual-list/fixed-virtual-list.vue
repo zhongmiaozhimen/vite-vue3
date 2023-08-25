@@ -4,13 +4,11 @@ import { reactive, ref } from 'vue'
 
 const forms = reactive({
   total: 1000,
-  itemHeight: '',
   buffer: 0,
 })
 
 const list = ref([])
 const maxHeight = 500
-const itemHeight = ref(0)
 const buffer = ref(0)
 
 updateList()
@@ -23,7 +21,6 @@ function updateList() {
     })
   }
 
-  itemHeight.value = forms.itemHeight
   buffer.value = forms.buffer
 }
 
@@ -63,15 +60,6 @@ function inputBlur(keyName) {
         />
       </el-form-item>
 
-      <el-form-item label="行高">
-        <el-input
-          v-model.number="forms.itemHeight"
-          placeholder="请输入每一行的高度"
-          maxlength="3"
-          @blur="inputBlur('itemHeight')"
-        />
-      </el-form-item>
-
       <el-form-item label="缓冲量">
         <el-input
           v-model.number="forms.buffer"
@@ -87,17 +75,9 @@ function inputBlur(keyName) {
     </el-form>
 
     <div class="wrap">
-      <VirtualList
-        :data="list"
-        :max-height="maxHeight"
-        :item-height="itemHeight"
-        :buffer="buffer"
-      >
+      <VirtualList :data="list" :max-height="maxHeight" :buffer="buffer">
         <template v-slot:default="{ item }">
-          <div
-            class="list-item"
-            :style="{ 'line-height': itemHeight ? itemHeight - 1 + 'px' : '' }"
-          >
+          <div class="list-item">
             {{ item.msg }}
           </div>
         </template>

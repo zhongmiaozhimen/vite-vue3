@@ -9,6 +9,7 @@ const ElementPlusForm = () =>
 const ElementPlusDescriptions = () =>
   import('@/components/examples/element-plus/descriptions/index.vue')
 const VxeTableList = () => import('@/components/examples/vxe-table/list.vue')
+const VxeTableTable = () => import('@/components/examples/vxe-table/table.vue')
 
 const routes = [
   { path: '/', redirect: '/virtual-list' },
@@ -66,6 +67,14 @@ const routes = [
     component: VxeTableList,
     meta: {
       title: 'vxe-table-list',
+    },
+  },
+  {
+    path: '/vxe-table/table',
+    name: 'vxeTableTable',
+    component: VxeTableTable,
+    meta: {
+      title: 'vxe-table-table',
     },
   },
   {

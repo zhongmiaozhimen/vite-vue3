@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 const list = ref([])
 
-loadData(10)
+loadData(500)
 
 function loadData(total) {
   for (let i = 0; i < total; i++) {
@@ -41,8 +41,8 @@ function loadData(total) {
   border: 1px solid #e8eaec;
 
   .list-item {
-    height: 100px;
-    line-height: 100px;
+    height: 50px;
+    line-height: 50px;
     text-align: center;
     border-bottom: 1px solid #999;
   }

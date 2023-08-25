@@ -4,13 +4,11 @@ import { ref, reactive } from 'vue'
 
 const forms = reactive({
   total: 1000,
-  minItemHeight: 45,
   buffer: 0,
 })
 
 const list = ref([])
 const maxHeight = 500
-const minItemHeight = ref(0)
 const buffer = ref(0)
 
 updateList()
@@ -26,7 +24,6 @@ function updateList() {
     })
   }
 
-  minItemHeight.value = forms.minItemHeight
   buffer.value = forms.buffer
 }
 
@@ -70,15 +67,6 @@ function inputBlur(keyName) {
         />
       </el-form-item>
 
-      <el-form-item label="最小行高">
-        <el-input
-          v-model="forms.minItemHeight"
-          placeholder="请输入行高的最小值"
-          maxlength="3"
-          @blur="inputBlur('minItemHeight')"
-        />
-      </el-form-item>
-
       <el-form-item label="缓冲量">
         <el-input
           v-model="forms.buffer"
@@ -97,7 +85,6 @@ function inputBlur(keyName) {
       <VirtualList
         :data="list"
         :max-height="maxHeight"
-        :min-item-height="minItemHeight"
         :buffer="buffer"
         :fixed="false"
       >

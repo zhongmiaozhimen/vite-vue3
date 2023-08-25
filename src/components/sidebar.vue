@@ -54,6 +54,7 @@ watch(
         </template>
 
         <el-menu-item index="/vxe-table/list">虚拟列表</el-menu-item>
+        <el-menu-item index="/vxe-table/table">表格</el-menu-item>
       </el-sub-menu>
     </el-menu>
   </aside>
