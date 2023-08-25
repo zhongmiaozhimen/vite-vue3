@@ -24,7 +24,7 @@ resizeObserver.observe(document.body)
   <div class="container">
     <div class="nav-bar">
       <div class="wrapper">
-        <div v-if="env !== 'prod'" class="env">{{ env }}</div>
+        <div class="env">{{ env }}</div>
       </div>
     </div>
 
