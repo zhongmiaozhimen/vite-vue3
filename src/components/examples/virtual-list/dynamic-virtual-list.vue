@@ -20,7 +20,7 @@ function updateList() {
     height = Math.ceil(Math.random() * 200)
     height = height < 30 ? 30 : height
     list.value.push({
-      msg: `${randomWord()} --- ${i}`,
+      msg: `${i} --- ${randomWord()}`,
     })
   }
 
@@ -88,10 +88,8 @@ function inputBlur(keyName) {
         :buffer="buffer"
         :fixed="false"
       >
-        <template v-slot:default="{ item }">
-          <div class="list-item">
-            {{ item.msg }}
-          </div>
+        <template v-slot:default="{ items }">
+          {{ items.msg }}
         </template>
       </VirtualList>
     </div>
@@ -104,8 +102,7 @@ function inputBlur(keyName) {
   max-width: 500px;
   border: 1px solid #333;
 
-  .list-item {
-    margin: 0 auto;
+  :deep(.list-item) {
     padding: 10px 100px;
     border-bottom: 1px solid #999;
   }

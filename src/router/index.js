@@ -8,6 +8,8 @@ const ElementPlusForm = () =>
   import('@/components/examples/element-plus/form/index.vue')
 const ElementPlusDescriptions = () =>
   import('@/components/examples/element-plus/descriptions/index.vue')
+const ElementPlusTable = () =>
+  import('@/components/examples/element-plus/table.vue')
 const VxeTableList = () => import('@/components/examples/vxe-table/list.vue')
 const VxeTableTable = () => import('@/components/examples/vxe-table/table.vue')
 
@@ -43,6 +45,14 @@ const routes = [
     component: Tooltip,
     meta: {
       title: 'Tooltip',
+    },
+  },
+  {
+    path: '/element-plus/table',
+    name: 'elementPlusTable',
+    component: ElementPlusTable,
+    meta: {
+      title: 'element-plus-table',
     },
   },
   {

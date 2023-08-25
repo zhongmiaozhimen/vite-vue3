@@ -42,6 +42,7 @@ watch(
           <span>element-plus</span>
         </template>
 
+        <el-menu-item index="/element-plus/table">Table 单格</el-menu-item>
         <el-menu-item index="/element-plus/form">Form 表单</el-menu-item>
         <el-menu-item index="/element-plus/descriptions">
           Descriptions 描述列表

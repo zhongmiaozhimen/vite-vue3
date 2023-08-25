@@ -57,8 +57,6 @@ resizeObserver.observe(document.body)
 
 <style lang="scss" scoped>
 .container {
-  overflow: hidden;
-
   .nav-bar {
     position: fixed;
     top: 0;
@@ -81,6 +79,10 @@ resizeObserver.observe(document.body)
     display: none;
     padding: 10px 18px;
     border-bottom: 1px solid #dcdfe6;
+    background-color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 999;
   }
 
   .sidebar :deep(.el-drawer) {

@@ -59,7 +59,9 @@ const listRef = ref(null)
 let listHeights = [] // 记录列表中每个元素的高度
 let ticking = false
 
+const tooltipRef = ref(null)
 const tooltipConfig = reactive({
+  show: false,
   content: null,
   maxWidth: 0,
   maxHeight: 0,
@@ -68,6 +70,7 @@ const tooltipConfig = reactive({
   opacity: 0,
   arrowStyle: null,
 })
+let timer = null
 
 init()
 
@@ -323,6 +326,10 @@ watch([() => props.height, () => props.maxHeight], () => {
 })
 
 function listScroll(el) {
+  if (props.showOverflowTooltip) {
+    tooltipConfig.show = false
+  }
+
   if (
     total <= 2 ||
     (!props.height && !props.maxHeight) ||
@@ -341,51 +348,162 @@ function listScroll(el) {
   updateLoadList(el.target.scrollTop)
 }
 
-// 鼠标是移入到 tooltip 中
-function enterTooltip() {
-  //
+// 鼠标移入
+function mouseOver(el) {
+  if (
+    !props.showOverflowTooltip ||
+    el.target === el.currentTarget ||
+    el.target.parentElement !== el.currentTarget
+  ) {
+    return
+  }
+
+  const mouseOverEl = el.target
+
+  const range = document.createRange()
+  range.setStart(mouseOverEl, 0)
+  range.setEnd(mouseOverEl, mouseOverEl.childNodes.length)
+  const rangeWidth = range.getBoundingClientRect().width
+
+  const mouseEnterElStyle = window.getComputedStyle(mouseOverEl)
+  const padding =
+    parseInt(mouseEnterElStyle.getPropertyValue('padding-left')) +
+    parseInt(mouseEnterElStyle.getPropertyValue('padding-right'))
+
+  const bound = mouseOverEl.getBoundingClientRect()
+  const containerWidth = bound.width
+
+  if (rangeWidth + padding - containerWidth > 0.02) {
+    // 文本溢出
+
+    clearTimeout(timer)
+    timer = null
+
+    tooltipConfig.show = true
+    tooltipConfig.content = mouseOverEl.innerText
+
+    const htmlWidth = document.documentElement.clientWidth
+    const htmlHeight = document.documentElement.clientHeight
+
+    const bottomDistance = htmlHeight - bound.top - bound.height
+
+    const maxWidth = htmlWidth - 40
+    const maxHeight = Math.max(bound.top, bottomDistance) - 40
+    tooltipConfig.maxWidth = maxWidth < 500 ? maxWidth : 500
+    tooltipConfig.maxHeight = maxHeight < 500 ? maxHeight : 500
+
+    nextTick(() => {
+      updatePosition(mouseOverEl, htmlWidth, bound, bottomDistance)
+    })
+  }
 }
-function leaveTooltip() {
-  //
+// 鼠标移出
+function mouseOut() {
+  if (!props.showOverflowTooltip || !tooltipConfig.show || timer) return
+
+  tooltipConfig.opacity = 0
+
+  timer = setTimeout(() => {
+    timer = null
+    tooltipConfig.show = false
+  }, 200)
+}
+
+// 更新tooltip的位置
+function updatePosition(el, htmlWidth, bound, bottomDistance) {
+  const tooltipWidth = tooltipRef.value.offsetWidth
+  let tooltipLeft = el.offsetLeft + bound.width / 2 - tooltipWidth / 2
+  let arrowLeft = tooltipWidth / 2 - 5 // 箭头元素定位时的left值
+
+  if (tooltipLeft < 0) {
+    arrowLeft += tooltipLeft
+    tooltipLeft = 0
+  } else if (tooltipLeft + tooltipWidth > htmlWidth) {
+    arrowLeft += tooltipLeft + tooltipWidth - htmlWidth
+    tooltipLeft = htmlWidth - tooltipWidth
+  }
+
+  const tooltipHeight = tooltipRef.value.offsetHeight + 10
+  let tooltipTop = el.offsetTop - listWrapRef.value.scrollTop - tooltipHeight
+  updateArrowStyle(arrowLeft)
+
+  if (bound.top < bottomDistance && tooltipHeight > bound.top) {
+    tooltipTop = bound.top + bound.height + 10
+    updateArrowStyle(arrowLeft, 'bottom')
+  }
+
+  tooltipConfig.left = tooltipLeft
+  tooltipConfig.top = tooltipTop
+
+  nextTick(() => {
+    tooltipConfig.opacity = 1
+  })
+}
+
+// 更新箭头的样式
+function updateArrowStyle(left, direction = 'top') {
+  if (direction === 'bottom') {
+    tooltipConfig.arrowStyle = {
+      left: left + 'px',
+      top: '-5px',
+      'border-right-color': 'transparent',
+      'border-bottom-color': 'transparent',
+      'border-top-left-radius': '2px',
+    }
+  } else {
+    tooltipConfig.arrowStyle = {
+      left: left + 'px',
+      bottom: '-5px',
+      'border-top-color': 'transparent',
+      'border-left-color': 'transparent',
+      'border-bottom-right-radius': '2px',
+    }
+  }
 }
 </script>
 
 <template>
-  <div
-    ref="listWrapRef"
-    class="list-wrap"
-    :style="{
-      height: height ? height + 'px' : '',
-      'max-height': viewportMaxHeight ? viewportMaxHeight + 'px' : '',
-    }"
-    @scroll="listScroll"
-  >
-    <ul
-      ref="listRef"
+  <div class="virtual-list">
+    <div
+      ref="listWrapRef"
+      class="list-wrap"
       :style="{
-        'padding-top': paddingTop + 'px',
-        'padding-bottom': paddingBottom + 'px',
+        height: height ? height + 'px' : '',
+        'max-height': viewportMaxHeight ? viewportMaxHeight + 'px' : '',
       }"
-      @mouseenter="enterTooltip"
-      @mouseleave="leaveTooltip"
+      @scroll="listScroll"
     >
-      <li
-        v-for="item in loadList"
-        :key="item.id"
-        class="list-item"
+      <ul
+        ref="listRef"
         :style="{
-          'word-break': fixed ? 'normal' : 'break-all',
-          overflow: fixed ? 'hidden' : 'visible',
+          'padding-top': paddingTop + 'px',
+          'padding-bottom': paddingBottom + 'px',
         }"
+        @mouseover="mouseOver"
+        @mouseout="mouseOut"
       >
-        <slot :item="item.data"></slot>
-      </li>
-    </ul>
+        <li
+          v-for="item in loadList"
+          :key="item.id"
+          class="list-item"
+          :class="{ 'is-tooltip': props.showOverflowTooltip }"
+          :style="{
+            'white-space': fixed ? 'nowrap' : 'normal',
+            'word-break': fixed ? 'normal' : 'break-all',
+            overflow: fixed ? 'hidden' : 'visible',
+          }"
+        >
+          <slot :items="item.data">{{ item }}</slot>
+        </li>
+      </ul>
+    </div>
 
     <div
-      v-if="showOverflowTooltip"
+      v-if="props.showOverflowTooltip"
+      ref="tooltipRef"
       class="tooltip"
       :style="{
+        display: tooltipConfig.show ? 'block' : 'none',
         left: tooltipConfig.left + 'px',
         top: tooltipConfig.top + 'px',
         opacity: tooltipConfig.opacity,
@@ -407,9 +525,16 @@ function leaveTooltip() {
 </template>
 
 <style scoped lang="scss">
-.list-wrap {
-  overflow-y: auto;
+.virtual-list {
   position: relative;
+
+  .list-wrap {
+    overflow-y: auto;
+
+    .list-item.is-tooltip {
+      text-overflow: ellipsis;
+    }
+  }
 
   .tooltip {
     position: absolute;
@@ -419,6 +544,7 @@ function leaveTooltip() {
     min-width: 30px;
     background-color: #fff;
     transition: opacity 0.2s linear;
+    pointer-events: none;
 
     .tooltip-content {
       font-size: 16px;

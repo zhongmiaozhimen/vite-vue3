@@ -13,6 +13,7 @@ function insertTooltip(el) {
   if (tooltipVNode && mouseEnterEl && mouseEnterEl === el) {
     clearTimeout(timer)
     timer = null
+    waiting = false
     updateTooltipOpacity(1)
     return
   }
@@ -38,6 +39,7 @@ function insertTooltip(el) {
     if (tooltipVNode) {
       clearTimeout(timer)
       timer = null
+      waiting = false
 
       tooltipVNode.component.exposed.updateReferenceEl(mouseEnterEl)
       nextTick(() => {
@@ -51,6 +53,7 @@ function insertTooltip(el) {
       // 鼠标可以进入到 tooltip 中
       tooltipVNode = createVNode(Tooltip, {
         referenceEl: el,
+        enterable,
         onEnterTooltip() {
           // 鼠标移入到 tooltip 中
           if (enterable && waiting) {
@@ -69,6 +72,7 @@ function insertTooltip(el) {
     } else {
       tooltipVNode = createVNode(Tooltip, {
         referenceEl: el,
+        enterable,
       })
     }
 
@@ -80,22 +84,18 @@ function insertTooltip(el) {
 
 // 移除tooltip
 function removeTooltip() {
-  clearTimeout(timer)
-  timer = null
-  if (!tooltipVNode) return
+  if (!tooltipVNode || timer) return
 
   waiting = true
   timer = setTimeout(() => {
-    updateTooltipOpacity(0)
-    timer = null
     waiting = false
+    updateTooltipOpacity(0)
 
     timer = setTimeout(() => {
       timer = null
       render(null, document.body)
       tooltipVNode = null
       mouseEnterEl = null
-      waiting = false
       removeScrollEvent()
     }, 200)
   }, 100)
@@ -103,15 +103,15 @@ function removeTooltip() {
 
 // 立即移除tooltip
 function immedRemoveTooltip() {
+  if (!tooltipVNode) return
+
   clearTimeout(timer)
   timer = null
-
-  if (!tooltipVNode) return
+  waiting = false
 
   render(null, document.body)
   tooltipVNode = null
   mouseEnterEl = null
-  waiting = false
   removeScrollEvent()
 }
 
@@ -135,17 +135,14 @@ function mouseleaveCallback() {
 }
 
 function mouseoverCallback(el) {
-  let curNode = null
-  nodeGroup.some((item) => {
-    if (item.el === el.target) {
-      return true
-    }
+  if (
+    el.target === el.currentTarget ||
+    el.target.parentElement !== el.currentTarget
+  ) {
+    return
+  }
 
-    if (item.el.contains(el.target)) {
-      curNode = item
-      return true
-    }
-  })
+  const curNode = nodeGroup.find((item) => item.el.contains(el.target))
 
   if (curNode) {
     enterable = curNode.enterable

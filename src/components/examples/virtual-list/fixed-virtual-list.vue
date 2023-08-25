@@ -17,7 +17,7 @@ function updateList() {
   list.value = []
   for (let i = 1; i <= forms.total; i++) {
     list.value.push({
-      msg: `${randomWord()} --- ${i}`,
+      msg: `${i} --- ${randomWord()}`,
     })
   }
 
@@ -25,15 +25,21 @@ function updateList() {
 }
 
 function randomWord() {
-  let result = ''
-  const arr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  const arr = [
+    'abcdefg',
+    'hijklmn',
+    'opq',
+    'rst',
+    'uvw',
+    'xyz',
+    '1',
+    '2',
+    '3',
+    '4',
+  ]
 
-  for (let i = 0; i < arr.length; i++) {
-    const random = Math.ceil(Math.random() * 10)
-    result += arr[random]
-  }
-
-  return result
+  const random = Math.ceil(Math.random() * 10)
+  return arr.slice(0, random)
 }
 
 function inputBlur(keyName) {
@@ -75,11 +81,14 @@ function inputBlur(keyName) {
     </el-form>
 
     <div class="wrap">
-      <VirtualList :data="list" :max-height="maxHeight" :buffer="buffer">
-        <template v-slot:default="{ item }">
-          <div class="list-item">
-            {{ item.msg }}
-          </div>
+      <VirtualList
+        :data="list"
+        :max-height="maxHeight"
+        :buffer="buffer"
+        show-overflow-tooltip
+      >
+        <template v-slot:default="{ items }">
+          {{ items.msg }}
         </template>
       </VirtualList>
     </div>
@@ -100,9 +109,8 @@ function inputBlur(keyName) {
   max-width: 500px;
   border: 1px solid #333;
 
-  .list-item {
-    text-align: center;
-    padding: 20px 0;
+  :deep(.list-item) {
+    padding: 5px 100px;
     border-bottom: 1px solid #999;
   }
 }

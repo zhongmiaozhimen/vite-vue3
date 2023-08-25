@@ -97,9 +97,7 @@ function touchMove(el, item) {
 
   const touches = el.targetTouches[0]
 
-  const mouseMoveY = touches.clientY - mouseStartY //鼠标移动的距离
-
-  updateDomPosition(item, mouseMoveY)
+  updateDomPosition(item, touches.clientY)
 }
 function touchEnd(item) {
   item.top = moveIndex * (itemHeight + space) + 10

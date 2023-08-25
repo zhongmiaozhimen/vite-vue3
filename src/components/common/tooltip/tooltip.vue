@@ -35,7 +35,7 @@ function updatePosition() {
   const htmlScrollTop = document.documentElement.scrollTop
   const htmlScrollLeft = document.documentElement.scrollLeft
   const bound = referenceEl.getBoundingClientRect()
-  const bottomDistance = htmlHeight - bound.top - referenceEl.clientHeight
+  const bottomDistance = htmlHeight - bound.top - bound.height
 
   const tooltipWidth = tooltipRef.value.offsetWidth
   let tooltipLeft = bound.left + bound.width / 2 - tooltipWidth / 2
@@ -54,7 +54,7 @@ function updatePosition() {
   updateArrowStyle(arrowLeft)
 
   if (bound.top < bottomDistance && tooltipHeight > bound.top) {
-    tooltipTop = bound.top + referenceEl.clientHeight + 15
+    tooltipTop = bound.top + bound.height + 15
     updateArrowStyle(arrowLeft, 'bottom')
   }
 
@@ -102,7 +102,7 @@ function updateTooltipInfo(el) {
   const maxWidth = htmlWidth - 40
 
   const bound = el.getBoundingClientRect()
-  const bottomDistance = htmlHeight - bound.top - el.clientHeight
+  const bottomDistance = htmlHeight - bound.top - bound.height
   const maxHeight = Math.max(bound.top, bottomDistance) - 40
 
   tooltipConfig.content = el.innerText
@@ -145,6 +145,7 @@ defineExpose({
       left: tooltipConfig.left + 'px',
       top: tooltipConfig.top + 'px',
       opacity: tooltipConfig.opacity,
+      'pointer-events': enterable ? 'auto' : 'none',
     }"
     @mouseenter="enterTooltip"
     @mouseleave="leaveTooltip"
