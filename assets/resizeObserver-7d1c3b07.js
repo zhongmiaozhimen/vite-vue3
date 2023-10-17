@@ -1,1 +1,0 @@
-import{E as o}from"./index-e0d98c21.js";function i(r,s){let e=!1;const n=new ResizeObserver(()=>{e||(e=!0,requestAnimationFrame(()=>{e=!1}),s&&s())});n.observe(r),o(()=>{n.unobserve(r)})}export{i as u};
