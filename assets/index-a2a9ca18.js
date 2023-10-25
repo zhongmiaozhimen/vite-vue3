@@ -1,1 +1,0 @@
-import{o as a,h as t,b as r,G as s,H as l,T as p,I as d}from"./index-cf16e109.js";const i={__name:"index",props:{teleportToBody:{type:Boolean,default:!0}},setup(e){return(o,n)=>(a(),t(d,{to:"body",disabled:!e.teleportToBody},[r(p,s(l(o.$attrs)),null,16)],8,["disabled"]))}};export{i as _};
